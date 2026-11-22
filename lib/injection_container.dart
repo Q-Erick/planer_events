@@ -31,6 +31,9 @@ import 'features/events/data/datasources/event_remote_datasource.dart';
 import 'features/events/data/repositories/event_repository_impl.dart';
 import 'features/events/domain/repositories/event_repository.dart';
 import 'features/events/domain/usecases/event_usecases.dart';
+import 'features/events/presentation/bloc/event_detail_cubit.dart';
+import 'features/events/presentation/bloc/event_form_cubit.dart';
+import 'features/events/presentation/bloc/events_list_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -133,4 +136,12 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CreateEvent(sl()));
   sl.registerLazySingleton(() => UpdateEvent(sl()));
   sl.registerLazySingleton(() => DeleteEvent(sl()));
+  sl.registerFactory(() => EventsListCubit(sl()));
+  sl.registerFactory(
+    () => EventDetailCubit(watchEvent: sl(), deleteEvent: sl()),
+  );
+  sl.registerFactory(
+    () =>
+        EventFormCubit(watchEvent: sl(), createEvent: sl(), updateEvent: sl()),
+  );
 }

@@ -1,5 +1,5 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -7,11 +7,14 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/verify_email_page.dart';
+import '../../features/events/presentation/pages/event_detail_page.dart';
+import '../../features/events/presentation/pages/event_form_page.dart';
+import '../../features/events/presentation/pages/home_page.dart';
+import '../../features/events/presentation/pages/location_picker_page.dart';
 import '../../features/onboarding/domain/usecases/onboarding_usecases.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../injection_container.dart';
-import '../widgets/user_avatar.dart';
 import 'go_router_refresh_stream.dart';
 
 class AppRoutes {
@@ -24,6 +27,11 @@ class AppRoutes {
   static const forgotPassword = '/forgot-password';
   static const verifyEmail = '/verify-email';
   static const profile = '/profile';
+  static const newEvent = '/events/new';
+  static const locationPicker = '/location-picker';
+
+  static String eventDetail(String id) => '/events/$id';
+  static String eventEdit(String id) => '/events/$id/edit';
 
   /// Rutas que solo se ven sin sesión.
   static const authRoutes = {login, register, forgotPassword};
@@ -34,7 +42,6 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.home,
-    // Vuelve a evaluar las redirecciones cada vez que cambia la sesión
     refreshListenable: GoRouterRefreshStream(sl<AuthBloc>().stream),
     redirect: _redirect,
     routes: [
@@ -59,12 +66,32 @@ class AppRouter {
         builder: (context, state) => const VerifyEmailPage(),
       ),
       GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
         path: AppRoutes.profile,
         builder: (context, state) => const ProfilePage(),
       ),
+      // Importante: '/events/new' va ANTES que '/events/:id'
       GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const _TemporaryHomePage(),
+        path: AppRoutes.newEvent,
+        builder: (context, state) => const EventFormPage(),
+      ),
+      GoRoute(
+        path: '/events/:id',
+        builder: (context, state) =>
+            EventDetailPage(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/events/:id/edit',
+        builder: (context, state) =>
+            EventFormPage(eventId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: AppRoutes.locationPicker,
+        builder: (context, state) =>
+            LocationPickerPage(initial: state.extra as LatLng?),
       ),
     ],
   );
@@ -80,17 +107,17 @@ class AppRouter {
     final auth = sl<AuthBloc>().state;
     final isAuthRoute = AppRoutes.authRoutes.contains(location);
 
-    // 2. Sin sesión → login (o registro / recuperar contraseña)
+    // 2. Sin sesión
     if (!auth.isAuthenticated) {
       return isAuthRoute ? null : AppRoutes.login;
     }
 
-    // 3. Con sesión pero correo sin verificar
+    // 3. Correo sin verificar
     if (auth.user!.needsEmailVerification) {
       return location == AppRoutes.verifyEmail ? null : AppRoutes.verifyEmail;
     }
 
-    // 4. Con sesión y verificado: fuera de las pantallas de acceso
+    // 4. Sesión completa: fuera de las pantallas de acceso
     if (isAuthRoute ||
         location == AppRoutes.verifyEmail ||
         location == AppRoutes.onboarding) {
@@ -98,64 +125,5 @@ class AppRouter {
     }
 
     return null;
-  }
-}
-
-/// Página temporal de inicio. Se reemplaza por el dashboard más adelante.
-class _TemporaryHomePage extends StatelessWidget {
-  const _TemporaryHomePage();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final user = context.select((AuthBloc bloc) => bloc.state.user);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Planer Events'),
-        actions: [
-          if (user != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => context.push(AppRoutes.profile),
-                child: UserAvatar(
-                  name: user.name,
-                  photoUrl: user.photoUrl,
-                  radius: 18,
-                ),
-              ),
-            ),
-        ],
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (user != null)
-                UserAvatar(
-                  name: user.name,
-                  photoUrl: user.photoUrl,
-                  radius: 48,
-                ),
-              const SizedBox(height: 16),
-              Text(
-                'Hola, ${user?.name ?? ''}',
-                style: theme.textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Aquí aparecerán tus eventos.',
-                style: theme.textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
