@@ -2,20 +2,31 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../features/onboarding/domain/usecases/onboarding_usecases.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../injection_container.dart';
 import '../theme/theme_cubit.dart';
 
 class AppRoutes {
   AppRoutes._();
 
   static const home = '/';
+  static const onboarding = '/onboarding';
 }
 
 class AppRouter {
   AppRouter._();
 
   static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.home,
+    // Si ya vio la introducción, va directo al inicio
+    initialLocation: sl<IsOnboardingCompleted>()()
+        ? AppRoutes.home
+        : AppRoutes.onboarding,
     routes: [
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingPage(),
+      ),
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const _TemporaryHomePage(),

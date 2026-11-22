@@ -5,6 +5,11 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/theme_cubit.dart';
+import 'features/onboarding/data/datasources/onboarding_local_datasource.dart';
+import 'features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import 'features/onboarding/domain/repositories/onboarding_repository.dart';
+import 'features/onboarding/domain/usecases/onboarding_usecases.dart';
+import 'features/onboarding/presentation/bloc/onboarding_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -20,5 +25,14 @@ Future<void> init() async {
   sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit(sl()));
 
   // ---------- Features ----------
-  // (se agregan en las siguientes partes)
+  // Onboarding
+  sl.registerLazySingleton<OnboardingLocalDataSource>(
+    () => OnboardingLocalDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => IsOnboardingCompleted(sl()));
+  sl.registerLazySingleton(() => CompleteOnboarding(sl()));
+  sl.registerFactory(() => OnboardingCubit(sl()));
 }
