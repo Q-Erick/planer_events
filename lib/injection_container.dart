@@ -7,6 +7,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'core/theme/theme_cubit.dart';
 import 'features/onboarding/data/datasources/onboarding_local_datasource.dart';
@@ -51,6 +52,11 @@ import 'features/checkin/data/repositories/biometric_repository_impl.dart';
 import 'features/checkin/domain/repositories/biometric_repository.dart';
 import 'features/checkin/domain/usecases/checkin_usecases.dart';
 import 'features/checkin/presentation/bloc/checkin_cubit.dart';
+import 'features/notifications/data/datasources/notification_datasource.dart';
+import 'features/notifications/data/repositories/notification_repository_impl.dart';
+import 'features/notifications/domain/repositories/notification_repository.dart';
+import 'features/notifications/domain/usecases/notification_usecases.dart';
+import 'features/notifications/presentation/bloc/notifications_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -65,6 +71,7 @@ Future<void> init() async {
   sl.registerLazySingleton<FacebookAuth>(() => FacebookAuth.instance);
   sl.registerLazySingleton<ImagePicker>(() => ImagePicker());
   sl.registerLazySingleton<LocalAuthentication>(() => LocalAuthentication());
+  sl.registerLazySingleton<FirebaseMessaging>(() => FirebaseMessaging.instance);
 
   // Correos de verificación y recuperación en español
   await FirebaseAuth.instance.setLanguageCode('es');
@@ -233,6 +240,34 @@ Future<void> init() async {
       watchGuests: sl(),
       watchTables: sl(),
       checkInGuest: sl(),
+    ),
+  );
+
+  // Notificaciones (global)
+  sl.registerLazySingleton<NotificationDataSource>(
+    () => NotificationDataSourceImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => RequestNotificationPermission(sl()));
+  sl.registerLazySingleton(() => WatchForegroundNotifications(sl()));
+  sl.registerLazySingleton(() => WatchOpenedNotifications(sl()));
+  sl.registerLazySingleton(() => GetInitialNotification(sl()));
+  sl.registerLazySingleton(() => GetSubscribedTopics(sl()));
+  sl.registerLazySingleton(() => SubscribeToTopic(sl()));
+  sl.registerLazySingleton(() => UnsubscribeFromTopic(sl()));
+  sl.registerLazySingleton(() => GetDeviceToken(sl()));
+  sl.registerLazySingleton(
+    () => NotificationsCubit(
+      requestPermission: sl(),
+      watchForeground: sl(),
+      watchOpened: sl(),
+      getInitial: sl(),
+      getTopics: sl(),
+      subscribe: sl(),
+      unsubscribe: sl(),
+      getToken: sl(),
     ),
   );
 }

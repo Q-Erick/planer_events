@@ -10,6 +10,8 @@ import '../../domain/entities/event_entity.dart';
 import '../bloc/event_detail_cubit.dart';
 import '../utils/event_type_ui.dart';
 import '../widgets/event_location_map.dart';
+import '../../../notifications/domain/entities/app_notification.dart';
+import '../../../notifications/presentation/bloc/notifications_cubit.dart';
 
 class EventDetailPage extends StatelessWidget {
   const EventDetailPage({super.key, required this.eventId});
@@ -37,6 +39,25 @@ class EventDetailPage extends StatelessWidget {
               title: Text(event?.name ?? 'Evento'),
               actions: [
                 if (event != null) ...[
+                  BlocBuilder<NotificationsCubit, NotificationsState>(
+                    builder: (context, notif) {
+                      final topic = eventTopic(event.id);
+                      final on = notif.isSubscribed(topic);
+                      return IconButton(
+                        tooltip: on
+                            ? 'Desactivar avisos del evento'
+                            : 'Recibir avisos del evento',
+                        icon: Icon(
+                          on
+                              ? Icons.notifications_active
+                              : Icons.notifications_none,
+                        ),
+                        onPressed: () => context
+                            .read<NotificationsCubit>()
+                            .toggleTopic(topic),
+                      );
+                    },
+                  ),
                   IconButton(
                     tooltip: 'Editar',
                     icon: const Icon(Icons.edit_outlined),

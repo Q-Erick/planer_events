@@ -17,6 +17,7 @@ import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/guests/presentation/pages/guests_page.dart';
 import '../../features/seating/presentation/pages/seating_page.dart';
 import '../../features/checkin/presentation/pages/checkin_page.dart';
+import '../../features/notifications/presentation/pages/notification_settings_page.dart';
 import '../../injection_container.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -32,6 +33,7 @@ class AppRoutes {
   static const profile = '/profile';
   static const newEvent = '/events/new';
   static const locationPicker = '/location-picker';
+  static const notifications = '/notifications';
 
   static String eventDetail(String id) => '/events/$id';
   static String eventEdit(String id) => '/events/$id/edit';
@@ -113,6 +115,10 @@ class AppRouter {
         path: AppRoutes.locationPicker,
         builder: (context, state) =>
             LocationPickerPage(initial: state.extra as LatLng?),
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationSettingsPage(),
       ),
     ],
   );

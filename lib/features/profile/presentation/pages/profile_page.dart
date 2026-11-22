@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/utils/snackbars.dart';
@@ -9,6 +10,7 @@ import '../../../../injection_container.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../bloc/profile_cubit.dart';
+import '../../../../core/router/app_router.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -120,6 +122,14 @@ class _ProfileView extends StatelessWidget {
                               : 'Se sincroniza con tu cuenta de '
                                     '${_providerLabel(user.provider)}.',
                         ),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.notifications_outlined),
+                        title: const Text('Notificaciones'),
+                        subtitle: const Text('Temas y avisos'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push(AppRoutes.notifications),
                       ),
                       const Divider(height: 1),
                       BlocBuilder<ThemeCubit, ThemeMode>(
