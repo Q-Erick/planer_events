@@ -18,6 +18,9 @@ import '../../features/guests/presentation/pages/guests_page.dart';
 import '../../features/seating/presentation/pages/seating_page.dart';
 import '../../features/checkin/presentation/pages/checkin_page.dart';
 import '../../features/notifications/presentation/pages/notification_settings_page.dart';
+import '../../features/subscription/domain/entities/subscription_plan.dart';
+import '../../features/subscription/presentation/pages/checkout_page.dart';
+import '../../features/subscription/presentation/pages/plans_page.dart';
 import '../../injection_container.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -34,12 +37,14 @@ class AppRoutes {
   static const newEvent = '/events/new';
   static const locationPicker = '/location-picker';
   static const notifications = '/notifications';
+  static const plans = '/plans';
 
   static String eventDetail(String id) => '/events/$id';
   static String eventEdit(String id) => '/events/$id/edit';
   static String guests(String eventId) => '/events/$eventId/guests';
   static String seating(String eventId) => '/events/$eventId/seating';
   static String checkIn(String eventId) => '/events/$eventId/checkin';
+  static String checkout(String planId) => '/plans/checkout/$planId';
 
   /// Rutas que solo se ven sin sesión.
   static const authRoutes = {login, register, forgotPassword};
@@ -119,6 +124,15 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.notifications,
         builder: (context, state) => const NotificationSettingsPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.plans,
+        builder: (context, state) => const PlansPage(),
+      ),
+      GoRoute(
+        path: '/plans/checkout/:plan',
+        builder: (context, state) =>
+            CheckoutPage(planId: planIdFrom(state.pathParameters['plan'])),
       ),
     ],
   );

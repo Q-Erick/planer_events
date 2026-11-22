@@ -125,6 +125,13 @@ class _ProfileView extends StatelessWidget {
                       ),
                       const Divider(height: 1),
                       ListTile(
+                        leading: const Icon(Icons.workspace_premium_outlined),
+                        title: const Text('Planes y suscripción'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push(AppRoutes.plans),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
                         leading: const Icon(Icons.notifications_outlined),
                         title: const Text('Notificaciones'),
                         subtitle: const Text('Temas y avisos'),

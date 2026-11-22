@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
 
 import 'core/theme/theme_cubit.dart';
 import 'features/onboarding/data/datasources/onboarding_local_datasource.dart';
@@ -57,6 +58,12 @@ import 'features/notifications/data/repositories/notification_repository_impl.da
 import 'features/notifications/domain/repositories/notification_repository.dart';
 import 'features/notifications/domain/usecases/notification_usecases.dart';
 import 'features/notifications/presentation/bloc/notifications_cubit.dart';
+import 'features/subscription/data/datasources/stripe_datasource.dart';
+import 'features/subscription/data/datasources/subscription_api_datasource.dart';
+import 'features/subscription/data/repositories/subscription_repository_impl.dart';
+import 'features/subscription/domain/repositories/subscription_repository.dart';
+import 'features/subscription/domain/usecases/subscription_usecases.dart';
+import 'features/subscription/presentation/bloc/subscription_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -72,6 +79,7 @@ Future<void> init() async {
   sl.registerLazySingleton<ImagePicker>(() => ImagePicker());
   sl.registerLazySingleton<LocalAuthentication>(() => LocalAuthentication());
   sl.registerLazySingleton<FirebaseMessaging>(() => FirebaseMessaging.instance);
+  sl.registerLazySingleton<http.Client>(() => http.Client());
 
   // Correos de verificación y recuperación en español
   await FirebaseAuth.instance.setLanguageCode('es');
@@ -268,6 +276,25 @@ Future<void> init() async {
       subscribe: sl(),
       unsubscribe: sl(),
       getToken: sl(),
+    ),
+  );
+
+  // Suscripciones
+  sl.registerLazySingleton<StripeDataSource>(() => StripeDataSourceImpl());
+  sl.registerLazySingleton<SubscriptionApiDataSource>(
+    () => SubscriptionApiDataSourceImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<SubscriptionRepository>(
+    () => SubscriptionRepositoryImpl(firestore: sl(), stripe: sl(), api: sl()),
+  );
+  sl.registerLazySingleton(() => WatchCurrentPlan(sl()));
+  sl.registerLazySingleton(() => SubscribeToPlan(sl()));
+  sl.registerLazySingleton(() => CancelSubscription(sl()));
+  sl.registerFactory(
+    () => SubscriptionCubit(
+      watchCurrentPlan: sl(),
+      subscribeToPlan: sl(),
+      cancelSubscription: sl(),
     ),
   );
 }
