@@ -12,4 +12,7 @@ abstract class GuestRepository {
   Future<Either<Failure, Unit>> updateGuest(GuestEntity guest);
 
   Future<Either<Failure, Unit>> deleteGuest(String eventId, String guestId);
+
+  /// Marca que el invitado ya llegó al evento.
+  Future<Either<Failure, Unit>> checkIn(String eventId, String guestId);
 }

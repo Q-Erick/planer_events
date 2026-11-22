@@ -44,4 +44,11 @@ class GuestRepositoryImpl implements GuestRepository {
       return left(const ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, Unit>> checkIn(String eventId, String guestId) =>
+      _guard(() async {
+        await _remote.checkIn(eventId, guestId);
+        return unit;
+      });
 }

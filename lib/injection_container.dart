@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:local_auth/local_auth.dart';
 
 import 'core/theme/theme_cubit.dart';
 import 'features/onboarding/data/datasources/onboarding_local_datasource.dart';
@@ -45,6 +46,11 @@ import 'features/seating/data/repositories/seating_repository_impl.dart';
 import 'features/seating/domain/repositories/seating_repository.dart';
 import 'features/seating/domain/usecases/seating_usecases.dart';
 import 'features/seating/presentation/bloc/seating_cubit.dart';
+import 'features/checkin/data/datasources/biometric_datasource.dart';
+import 'features/checkin/data/repositories/biometric_repository_impl.dart';
+import 'features/checkin/domain/repositories/biometric_repository.dart';
+import 'features/checkin/domain/usecases/checkin_usecases.dart';
+import 'features/checkin/presentation/bloc/checkin_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -58,6 +64,7 @@ Future<void> init() async {
   sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
   sl.registerLazySingleton<FacebookAuth>(() => FacebookAuth.instance);
   sl.registerLazySingleton<ImagePicker>(() => ImagePicker());
+  sl.registerLazySingleton<LocalAuthentication>(() => LocalAuthentication());
 
   // Correos de verificación y recuperación en español
   await FirebaseAuth.instance.setLanguageCode('es');
@@ -165,6 +172,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AddGuest(sl()));
   sl.registerLazySingleton(() => UpdateGuest(sl()));
   sl.registerLazySingleton(() => DeleteGuest(sl()));
+  sl.registerLazySingleton(() => CheckInGuest(sl()));
   sl.registerFactory(
     () => GuestsCubit(
       watchGuests: sl(),
@@ -208,6 +216,23 @@ Future<void> init() async {
       assignGuest: sl(),
       releaseSeat: sl(),
       releaseGuestSeats: sl(),
+    ),
+  );
+
+  // Recepción
+  sl.registerLazySingleton<BiometricDataSource>(
+    () => BiometricDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<BiometricRepository>(
+    () => BiometricRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => AuthenticateReception(sl()));
+  sl.registerFactory(
+    () => CheckInCubit(
+      authenticateReception: sl(),
+      watchGuests: sl(),
+      watchTables: sl(),
+      checkInGuest: sl(),
     ),
   );
 }

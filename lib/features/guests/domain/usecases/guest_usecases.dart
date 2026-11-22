@@ -71,3 +71,12 @@ class DeleteGuest implements UseCase<Unit, GuestRef> {
   Future<Either<Failure, Unit>> call(GuestRef ref) =>
       _repository.deleteGuest(ref.eventId, ref.guestId);
 }
+
+class CheckInGuest implements UseCase<Unit, GuestRef> {
+  const CheckInGuest(this._repository);
+  final GuestRepository _repository;
+
+  @override
+  Future<Either<Failure, Unit>> call(GuestRef ref) =>
+      _repository.checkIn(ref.eventId, ref.guestId);
+}

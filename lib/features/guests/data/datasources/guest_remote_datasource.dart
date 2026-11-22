@@ -8,6 +8,7 @@ abstract class GuestRemoteDataSource {
   Future<String> addGuest(GuestModel guest);
   Future<void> updateGuest(GuestModel guest);
   Future<void> deleteGuest(String eventId, String guestId);
+  Future<void> checkIn(String eventId, String guestId);
 }
 
 class GuestRemoteDataSourceImpl implements GuestRemoteDataSource {
@@ -58,6 +59,18 @@ class GuestRemoteDataSourceImpl implements GuestRemoteDataSource {
       await _guests(eventId).doc(guestId).delete();
     } on FirebaseException catch (e) {
       throw ServerException(e.message ?? 'No se pudo eliminar el invitado.');
+    }
+  }
+
+  @override
+  Future<void> checkIn(String eventId, String guestId) async {
+    try {
+      await _guests(eventId).doc(guestId).update({
+        'checkedIn': true,
+        'checkedInAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      throw ServerException(e.message ?? 'No se pudo registrar la llegada.');
     }
   }
 }
