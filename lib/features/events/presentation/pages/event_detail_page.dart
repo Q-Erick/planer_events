@@ -216,24 +216,25 @@ class _EventDetailBody extends StatelessWidget {
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
                     childAspectRatio: 1.4,
-                    children: const [
-                      _ModuleTile(
+                    children: [
+                      const _ModuleTile(
                         icon: Icons.mail_outline,
                         label: 'Invitación',
                       ),
                       _ModuleTile(
                         icon: Icons.people_outline,
                         label: 'Invitados',
+                        onTap: () => context.push(AppRoutes.guests(event.id)),
                       ),
-                      _ModuleTile(
+                      const _ModuleTile(
                         icon: Icons.table_restaurant_outlined,
                         label: 'Plano de mesas',
                       ),
-                      _ModuleTile(
+                      const _ModuleTile(
                         icon: Icons.qr_code_scanner,
                         label: 'Recepción',
                       ),
-                      _ModuleTile(
+                      const _ModuleTile(
                         icon: Icons.photo_library_outlined,
                         label: 'Álbum',
                       ),

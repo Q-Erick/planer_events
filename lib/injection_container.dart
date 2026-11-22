@@ -34,6 +34,12 @@ import 'features/events/domain/usecases/event_usecases.dart';
 import 'features/events/presentation/bloc/event_detail_cubit.dart';
 import 'features/events/presentation/bloc/event_form_cubit.dart';
 import 'features/events/presentation/bloc/events_list_cubit.dart';
+import 'features/guests/data/datasources/guest_remote_datasource.dart';
+import 'features/guests/data/repositories/guest_repository_impl.dart';
+import 'features/guests/domain/repositories/guest_repository.dart';
+import 'features/guests/domain/usecases/guest_usecases.dart';
+import 'features/guests/presentation/bloc/guest_form_cubit.dart';
+import 'features/guests/presentation/bloc/guests_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -144,4 +150,18 @@ Future<void> init() async {
     () =>
         EventFormCubit(watchEvent: sl(), createEvent: sl(), updateEvent: sl()),
   );
+
+  // Invitados
+  sl.registerLazySingleton<GuestRemoteDataSource>(
+    () => GuestRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<GuestRepository>(() => GuestRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => WatchGuests(sl()));
+  sl.registerLazySingleton(() => AddGuest(sl()));
+  sl.registerLazySingleton(() => UpdateGuest(sl()));
+  sl.registerLazySingleton(() => DeleteGuest(sl()));
+  sl.registerFactory(
+    () => GuestsCubit(watchGuests: sl(), watchEvent: sl(), deleteGuest: sl()),
+  );
+  sl.registerFactory(() => GuestFormCubit(addGuest: sl(), updateGuest: sl()));
 }
