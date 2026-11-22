@@ -40,6 +40,10 @@ import 'features/guests/domain/repositories/guest_repository.dart';
 import 'features/guests/domain/usecases/guest_usecases.dart';
 import 'features/guests/presentation/bloc/guest_form_cubit.dart';
 import 'features/guests/presentation/bloc/guests_cubit.dart';
+import 'features/seating/data/datasources/seating_remote_datasource.dart';
+import 'features/seating/data/repositories/seating_repository_impl.dart';
+import 'features/seating/domain/repositories/seating_repository.dart';
+import 'features/seating/domain/usecases/seating_usecases.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -164,4 +168,23 @@ Future<void> init() async {
     () => GuestsCubit(watchGuests: sl(), watchEvent: sl(), deleteGuest: sl()),
   );
   sl.registerFactory(() => GuestFormCubit(addGuest: sl(), updateGuest: sl()));
+
+  // Plano de mesas
+  sl.registerLazySingleton<SeatingRemoteDataSource>(
+    () => SeatingRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<SeatingRepository>(
+    () => SeatingRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => WatchTables(sl()));
+  sl.registerLazySingleton(() => WatchSeatsPerTable(sl()));
+  sl.registerLazySingleton(() => SetSeatsPerTable(sl()));
+  sl.registerLazySingleton(() => AddTable(sl()));
+  sl.registerLazySingleton(() => MoveTable(sl()));
+  sl.registerLazySingleton(() => ChangeTableSeats(sl()));
+  sl.registerLazySingleton(() => ChangeTableShape(sl()));
+  sl.registerLazySingleton(() => DeleteTable(sl()));
+  sl.registerLazySingleton(() => AssignGuest(sl()));
+  sl.registerLazySingleton(() => ReleaseSeat(sl()));
+  sl.registerLazySingleton(() => ReleaseGuestSeats(sl()));
 }
