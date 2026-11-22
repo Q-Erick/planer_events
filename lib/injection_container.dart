@@ -26,6 +26,7 @@ import 'features/profile/data/datasources/profile_remote_datasource.dart';
 import 'features/profile/data/repositories/profile_repository_impl.dart';
 import 'features/profile/domain/repositories/profile_repository.dart';
 import 'features/profile/domain/usecases/profile_usecases.dart';
+import 'features/profile/presentation/bloc/profile_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -110,4 +111,11 @@ Future<void> init() async {
   );
   sl.registerLazySingleton(() => UpdateProfilePhoto(sl()));
   sl.registerLazySingleton(() => UpdateDisplayName(sl()));
+  sl.registerFactory(
+    () => ProfileCubit(
+      updateProfilePhoto: sl(),
+      updateDisplayName: sl(),
+      imagePicker: sl(),
+    ),
+  );
 }

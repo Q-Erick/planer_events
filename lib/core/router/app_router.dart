@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -10,8 +9,9 @@ import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/verify_email_page.dart';
 import '../../features/onboarding/domain/usecases/onboarding_usecases.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../injection_container.dart';
-import '../theme/theme_cubit.dart';
+import '../widgets/user_avatar.dart';
 import 'go_router_refresh_stream.dart';
 
 class AppRoutes {
@@ -23,6 +23,7 @@ class AppRoutes {
   static const register = '/register';
   static const forgotPassword = '/forgot-password';
   static const verifyEmail = '/verify-email';
+  static const profile = '/profile';
 
   /// Rutas que solo se ven sin sesión.
   static const authRoutes = {login, register, forgotPassword};
@@ -56,6 +57,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.verifyEmail,
         builder: (context, state) => const VerifyEmailPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfilePage(),
       ),
       GoRoute(
         path: AppRoutes.home,
@@ -109,22 +114,19 @@ class _TemporaryHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Planer Events'),
         actions: [
-          IconButton(
-            tooltip: 'Cambiar tema',
-            icon: Icon(
-              theme.brightness == Brightness.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
+          if (user != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => context.push(AppRoutes.profile),
+                child: UserAvatar(
+                  name: user.name,
+                  photoUrl: user.photoUrl,
+                  radius: 18,
+                ),
+              ),
             ),
-            onPressed: () =>
-                context.read<ThemeCubit>().toggle(theme.brightness),
-          ),
-          IconButton(
-            tooltip: 'Cerrar sesión',
-            icon: const Icon(Icons.logout),
-            onPressed: () =>
-                context.read<AuthBloc>().add(const AuthSignOutRequested()),
-          ),
         ],
       ),
       body: Center(
@@ -133,15 +135,12 @@ class _TemporaryHomePage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircleAvatar(
-                radius: 48,
-                backgroundImage: user?.photoUrl != null
-                    ? CachedNetworkImageProvider(user!.photoUrl!)
-                    : null,
-                child: user?.photoUrl == null
-                    ? const Icon(Icons.person, size: 48)
-                    : null,
-              ),
+              if (user != null)
+                UserAvatar(
+                  name: user.name,
+                  photoUrl: user.photoUrl,
+                  radius: 48,
+                ),
               const SizedBox(height: 16),
               Text(
                 'Hola, ${user?.name ?? ''}',
@@ -149,11 +148,9 @@ class _TemporaryHomePage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              Text(user?.email ?? '', style: theme.textTheme.bodyLarge),
-              const SizedBox(height: 4),
               Text(
-                'Proveedor: ${user?.provider.name ?? ''}',
-                style: theme.textTheme.bodySmall,
+                'Aquí aparecerán tus eventos.',
+                style: theme.textTheme.bodyLarge,
               ),
             ],
           ),
