@@ -27,6 +27,10 @@ import 'features/profile/data/repositories/profile_repository_impl.dart';
 import 'features/profile/domain/repositories/profile_repository.dart';
 import 'features/profile/domain/usecases/profile_usecases.dart';
 import 'features/profile/presentation/bloc/profile_cubit.dart';
+import 'features/events/data/datasources/event_remote_datasource.dart';
+import 'features/events/data/repositories/event_repository_impl.dart';
+import 'features/events/domain/repositories/event_repository.dart';
+import 'features/events/domain/usecases/event_usecases.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -118,4 +122,15 @@ Future<void> init() async {
       imagePicker: sl(),
     ),
   );
+
+  // Eventos
+  sl.registerLazySingleton<EventRemoteDataSource>(
+    () => EventRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<EventRepository>(() => EventRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => WatchHostEvents(sl()));
+  sl.registerLazySingleton(() => WatchEvent(sl()));
+  sl.registerLazySingleton(() => CreateEvent(sl()));
+  sl.registerLazySingleton(() => UpdateEvent(sl()));
+  sl.registerLazySingleton(() => DeleteEvent(sl()));
 }
