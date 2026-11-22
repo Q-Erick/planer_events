@@ -21,6 +21,7 @@ import '../../features/notifications/presentation/pages/notification_settings_pa
 import '../../features/subscription/domain/entities/subscription_plan.dart';
 import '../../features/subscription/presentation/pages/checkout_page.dart';
 import '../../features/subscription/presentation/pages/plans_page.dart';
+import '../../features/album/presentation/pages/album_page.dart';
 import '../../injection_container.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -44,6 +45,7 @@ class AppRoutes {
   static String guests(String eventId) => '/events/$eventId/guests';
   static String seating(String eventId) => '/events/$eventId/seating';
   static String checkIn(String eventId) => '/events/$eventId/checkin';
+  static String album(String eventId) => '/events/$eventId/album';
   static String checkout(String planId) => '/plans/checkout/$planId';
 
   /// Rutas que solo se ven sin sesión.
@@ -115,6 +117,11 @@ class AppRouter {
         path: '/events/:id/checkin',
         builder: (context, state) =>
             CheckInPage(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/events/:id/album',
+        builder: (context, state) =>
+            AlbumPage(eventId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: AppRoutes.locationPicker,

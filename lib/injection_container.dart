@@ -64,6 +64,11 @@ import 'features/subscription/data/repositories/subscription_repository_impl.dar
 import 'features/subscription/domain/repositories/subscription_repository.dart';
 import 'features/subscription/domain/usecases/subscription_usecases.dart';
 import 'features/subscription/presentation/bloc/subscription_cubit.dart';
+import 'features/album/data/datasources/album_remote_datasource.dart';
+import 'features/album/data/repositories/album_repository_impl.dart';
+import 'features/album/domain/repositories/album_repository.dart';
+import 'features/album/domain/usecases/album_usecases.dart';
+import 'features/album/presentation/bloc/album_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -295,6 +300,24 @@ Future<void> init() async {
       watchCurrentPlan: sl(),
       subscribeToPlan: sl(),
       cancelSubscription: sl(),
+    ),
+  );
+
+  // Álbum
+  sl.registerLazySingleton<AlbumRemoteDataSource>(
+    () => AlbumRemoteDataSourceImpl(firestore: sl(), storage: sl()),
+  );
+  sl.registerLazySingleton<AlbumRepository>(() => AlbumRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => WatchPhotos(sl()));
+  sl.registerLazySingleton(() => UploadPhoto(sl()));
+  sl.registerLazySingleton(() => DeletePhoto(sl()));
+  sl.registerFactory(
+    () => AlbumCubit(
+      watchPhotos: sl(),
+      watchEvent: sl(),
+      uploadPhoto: sl(),
+      deletePhoto: sl(),
+      imagePicker: sl(),
     ),
   );
 }

@@ -257,9 +257,10 @@ class _EventDetailBody extends StatelessWidget {
                         label: 'Recepción',
                         onTap: () => context.push(AppRoutes.checkIn(event.id)),
                       ),
-                      const _ModuleTile(
+                      _ModuleTile(
                         icon: Icons.photo_library_outlined,
                         label: 'Álbum',
+                        onTap: () => context.push(AppRoutes.album(event.id)),
                       ),
                     ],
                   );
