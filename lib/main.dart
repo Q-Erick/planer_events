@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
+import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,10 @@ class PlanerEventsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider<ThemeCubit>.value(value: di.sl<ThemeCubit>())],
+      providers: [
+        BlocProvider<ThemeCubit>.value(value: di.sl<ThemeCubit>()),
+        BlocProvider<AuthBloc>.value(value: di.sl<AuthBloc>()),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp.router(

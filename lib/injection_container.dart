@@ -16,6 +16,11 @@ import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/auth_usecases.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/forgot_password_cubit.dart';
+import 'features/auth/presentation/bloc/login_cubit.dart';
+import 'features/auth/presentation/bloc/register_cubit.dart';
+import 'features/auth/presentation/bloc/verify_email_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -67,4 +72,25 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ReloadUser(sl()));
   sl.registerLazySingleton(() => SendPasswordReset(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
+
+  // AuthBloc es global (uno solo para toda la app)
+  sl.registerLazySingleton(
+    () =>
+        AuthBloc(getAuthStateChanges: sl(), getCurrentUser: sl(), signOut: sl())
+          ..add(const AuthSubscriptionRequested()),
+  );
+
+  // Cubits de formularios (uno nuevo cada vez que se abre la pantalla)
+  sl.registerFactory(
+    () => LoginCubit(
+      signInWithEmail: sl(),
+      signInWithGoogle: sl(),
+      signInWithFacebook: sl(),
+    ),
+  );
+  sl.registerFactory(() => RegisterCubit(registerWithEmail: sl()));
+  sl.registerFactory(() => ForgotPasswordCubit(sendPasswordReset: sl()));
+  sl.registerFactory(
+    () => VerifyEmailCubit(reloadUser: sl(), sendEmailVerification: sl()),
+  );
 }
