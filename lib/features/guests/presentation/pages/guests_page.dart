@@ -181,8 +181,11 @@ class _GuestTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final seated = context.select(
+      (GuestsCubit cubit) => cubit.state.seatedOf(guest.id),
+    );
     final subtitle = [
-      guest.passes == 1 ? '1 lugar' : '${guest.passes} lugares',
+      '$seated/${guest.passes} sentados',
       if (guest.phone.isNotEmpty) guest.phone,
     ].join(' · ');
 

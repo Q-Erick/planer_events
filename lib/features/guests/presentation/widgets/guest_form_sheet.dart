@@ -8,14 +8,14 @@ import '../../../auth/presentation/widgets/auth_layout.dart';
 import '../../domain/entities/guest_entity.dart';
 import '../bloc/guest_form_cubit.dart';
 
-/// Abre el formulario. Devuelve el id del invitado guardado.
-Future<String?> showGuestFormSheet(
+/// Abre el formulario. Devuelve el invitado guardado.
+Future<GuestEntity?> showGuestFormSheet(
   BuildContext context, {
   required String eventId,
   GuestEntity? guest,
   String initialName = '',
 }) {
-  return showModalBottomSheet<String>(
+  return showModalBottomSheet<GuestEntity>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
@@ -39,7 +39,7 @@ class _GuestFormSheet extends StatelessWidget {
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == FormStatus.success) {
-          Navigator.of(context).pop(state.savedGuestId);
+          Navigator.of(context).pop(state.savedGuest);
         } else if (state.status == FormStatus.failure) {
           showAppSnackBar(
             context,

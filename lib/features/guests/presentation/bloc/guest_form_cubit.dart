@@ -16,12 +16,10 @@ class GuestFormState extends Equatable {
     this.showErrors = false,
     this.status = FormStatus.initial,
     this.errorMessage,
-    this.savedGuestId,
+    this.savedGuest,
   });
 
   final String eventId;
-
-  /// Invitado original cuando se está editando.
   final GuestEntity? original;
   final String name;
   final String phone;
@@ -29,7 +27,9 @@ class GuestFormState extends Equatable {
   final bool showErrors;
   final FormStatus status;
   final String? errorMessage;
-  final String? savedGuestId;
+
+  /// Invitado guardado (con su id).
+  final GuestEntity? savedGuest;
 
   bool get isEditing => original != null;
   bool get isSaving => status == FormStatus.loading;
@@ -46,7 +46,7 @@ class GuestFormState extends Equatable {
     bool? showErrors,
     FormStatus? status,
     String? errorMessage,
-    String? savedGuestId,
+    GuestEntity? savedGuest,
   }) {
     return GuestFormState(
       eventId: eventId ?? this.eventId,
@@ -57,7 +57,7 @@ class GuestFormState extends Equatable {
       showErrors: showErrors ?? this.showErrors,
       status: status ?? this.status,
       errorMessage: errorMessage,
-      savedGuestId: savedGuestId ?? this.savedGuestId,
+      savedGuest: savedGuest ?? this.savedGuest,
     );
   }
 
@@ -71,7 +71,7 @@ class GuestFormState extends Equatable {
     showErrors,
     status,
     errorMessage,
-    savedGuestId,
+    savedGuest,
   ];
 }
 
@@ -124,8 +124,8 @@ class GuestFormCubit extends Cubit<GuestFormState> {
     final base =
         state.original ?? GuestEntity(eventId: state.eventId, name: '');
     final guest = base.copyWith(
-      name: state.name,
-      phone: state.phone,
+      name: state.name.trim(),
+      phone: state.phone.trim(),
       passes: state.passes,
     );
 
@@ -136,9 +136,8 @@ class GuestFormCubit extends Cubit<GuestFormState> {
         (f) => emit(
           state.copyWith(status: FormStatus.failure, errorMessage: f.message),
         ),
-        (_) => emit(
-          state.copyWith(status: FormStatus.success, savedGuestId: guest.id),
-        ),
+        (_) =>
+            emit(state.copyWith(status: FormStatus.success, savedGuest: guest)),
       );
     } else {
       final result = await _addGuest(guest);
@@ -147,8 +146,12 @@ class GuestFormCubit extends Cubit<GuestFormState> {
         (f) => emit(
           state.copyWith(status: FormStatus.failure, errorMessage: f.message),
         ),
-        (id) =>
-            emit(state.copyWith(status: FormStatus.success, savedGuestId: id)),
+        (id) => emit(
+          state.copyWith(
+            status: FormStatus.success,
+            savedGuest: guest.copyWith(id: id),
+          ),
+        ),
       );
     }
   }

@@ -226,9 +226,10 @@ class _EventDetailBody extends StatelessWidget {
                         label: 'Invitados',
                         onTap: () => context.push(AppRoutes.guests(event.id)),
                       ),
-                      const _ModuleTile(
+                      _ModuleTile(
                         icon: Icons.table_restaurant_outlined,
                         label: 'Plano de mesas',
+                        onTap: () => context.push(AppRoutes.seating(event.id)),
                       ),
                       const _ModuleTile(
                         icon: Icons.qr_code_scanner,

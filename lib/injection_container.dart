@@ -44,6 +44,7 @@ import 'features/seating/data/datasources/seating_remote_datasource.dart';
 import 'features/seating/data/repositories/seating_repository_impl.dart';
 import 'features/seating/domain/repositories/seating_repository.dart';
 import 'features/seating/domain/usecases/seating_usecases.dart';
+import 'features/seating/presentation/bloc/seating_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -165,7 +166,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => UpdateGuest(sl()));
   sl.registerLazySingleton(() => DeleteGuest(sl()));
   sl.registerFactory(
-    () => GuestsCubit(watchGuests: sl(), watchEvent: sl(), deleteGuest: sl()),
+    () => GuestsCubit(
+      watchGuests: sl(),
+      watchEvent: sl(),
+      watchTables: sl(),
+      deleteGuest: sl(),
+      releaseGuestSeats: sl(),
+    ),
   );
   sl.registerFactory(() => GuestFormCubit(addGuest: sl(), updateGuest: sl()));
 
@@ -187,4 +194,20 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AssignGuest(sl()));
   sl.registerLazySingleton(() => ReleaseSeat(sl()));
   sl.registerLazySingleton(() => ReleaseGuestSeats(sl()));
+  sl.registerFactory(
+    () => SeatingCubit(
+      watchTables: sl(),
+      watchSeatsPerTable: sl(),
+      watchGuests: sl(),
+      setSeatsPerTable: sl(),
+      addTable: sl(),
+      moveTable: sl(),
+      changeTableSeats: sl(),
+      changeTableShape: sl(),
+      deleteTable: sl(),
+      assignGuest: sl(),
+      releaseSeat: sl(),
+      releaseGuestSeats: sl(),
+    ),
+  );
 }

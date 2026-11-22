@@ -15,6 +15,7 @@ import '../../features/onboarding/domain/usecases/onboarding_usecases.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/guests/presentation/pages/guests_page.dart';
+import '../../features/seating/presentation/pages/seating_page.dart';
 import '../../injection_container.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -34,6 +35,7 @@ class AppRoutes {
   static String eventDetail(String id) => '/events/$id';
   static String eventEdit(String id) => '/events/$id/edit';
   static String guests(String eventId) => '/events/$eventId/guests';
+  static String seating(String eventId) => '/events/$eventId/seating';
 
   /// Rutas que solo se ven sin sesión.
   static const authRoutes = {login, register, forgotPassword};
@@ -94,6 +96,11 @@ class AppRouter {
         path: '/events/:id/guests',
         builder: (context, state) =>
             GuestsPage(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/events/:id/seating',
+        builder: (context, state) =>
+            SeatingPage(eventId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: AppRoutes.locationPicker,
