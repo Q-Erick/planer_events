@@ -46,3 +46,16 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+
+# Firebase (llaves del proyecto, se generan con: flutterfire configure)
+android/app/google-services.json
+lib/firebase_options.dart
+web/firebase-messaging-sw.js
+
+# Llaves y secretos
+.env
+*.env
+*.jks
+*.keystore
+android/key.properties
