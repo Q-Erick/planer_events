@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'core/theme/theme_cubit.dart';
 import 'features/onboarding/data/datasources/onboarding_local_datasource.dart';
@@ -21,6 +22,10 @@ import 'features/auth/presentation/bloc/forgot_password_cubit.dart';
 import 'features/auth/presentation/bloc/login_cubit.dart';
 import 'features/auth/presentation/bloc/register_cubit.dart';
 import 'features/auth/presentation/bloc/verify_email_cubit.dart';
+import 'features/profile/data/datasources/profile_remote_datasource.dart';
+import 'features/profile/data/repositories/profile_repository_impl.dart';
+import 'features/profile/domain/repositories/profile_repository.dart';
+import 'features/profile/domain/usecases/profile_usecases.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -33,6 +38,7 @@ Future<void> init() async {
   sl.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
   sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
   sl.registerLazySingleton<FacebookAuth>(() => FacebookAuth.instance);
+  sl.registerLazySingleton<ImagePicker>(() => ImagePicker());
 
   // Correos de verificación y recuperación en español
   await FirebaseAuth.instance.setLanguageCode('es');
@@ -93,4 +99,15 @@ Future<void> init() async {
   sl.registerFactory(
     () => VerifyEmailCubit(reloadUser: sl(), sendEmailVerification: sl()),
   );
+
+  // Perfil
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () =>
+        ProfileRemoteDataSourceImpl(auth: sl(), storage: sl(), firestore: sl()),
+  );
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => UpdateProfilePhoto(sl()));
+  sl.registerLazySingleton(() => UpdateDisplayName(sl()));
 }
