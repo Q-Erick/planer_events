@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Con qué proveedor inició sesión el usuario.
 enum AuthProviderType { email, google, facebook }
 
 class UserEntity extends Equatable {
@@ -11,6 +10,7 @@ class UserEntity extends Equatable {
     this.displayName,
     this.photoUrl,
     this.emailVerified = false,
+    this.isAnonymous = false,
   });
 
   final String uid;
@@ -20,18 +20,19 @@ class UserEntity extends Equatable {
   final bool emailVerified;
   final AuthProviderType provider;
 
-  /// Regla de negocio: solo las cuentas de correo pueden cambiar su foto.
-  /// Las de Google o Facebook usan la foto de su proveedor.
-  bool get canEditPhoto => provider == AuthProviderType.email;
+  /// Invitado que abrió su invitación sin crear cuenta.
+  final bool isAnonymous;
 
-  /// Google y Facebook ya verifican el correo por su cuenta.
+  bool get canEditPhoto => provider == AuthProviderType.email && !isAnonymous;
+
   bool get needsEmailVerification =>
-      provider == AuthProviderType.email && !emailVerified;
+      !isAnonymous && provider == AuthProviderType.email && !emailVerified;
 
-  /// Nombre para mostrar; si no tiene, usa la parte inicial del correo.
-  String get name => (displayName != null && displayName!.isNotEmpty)
-      ? displayName!
-      : email.split('@').first;
+  String get name {
+    if (displayName != null && displayName!.isNotEmpty) return displayName!;
+    if (email.isNotEmpty) return email.split('@').first;
+    return 'Invitado';
+  }
 
   @override
   List<Object?> get props => [
@@ -41,5 +42,6 @@ class UserEntity extends Equatable {
     photoUrl,
     emailVerified,
     provider,
+    isAnonymous,
   ];
 }

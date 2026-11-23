@@ -34,4 +34,6 @@ abstract class AuthRepository {
   Future<Either<Failure, Unit>> sendPasswordReset(String email);
 
   Future<Either<Failure, Unit>> signOut();
+
+  Future<Either<Failure, UserEntity>> signInAnonymously();
 }

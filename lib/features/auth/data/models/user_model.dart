@@ -10,6 +10,7 @@ class UserModel extends UserEntity {
     super.displayName,
     super.photoUrl,
     super.emailVerified,
+    super.isAnonymous,
   });
 
   /// Crea el modelo a partir del usuario de Firebase Auth.
@@ -21,6 +22,7 @@ class UserModel extends UserEntity {
       photoUrl: user.photoURL,
       emailVerified: user.emailVerified,
       provider: _providerFrom(user),
+      isAnonymous: user.isAnonymous,
     );
   }
 

@@ -74,6 +74,7 @@ import 'features/invitation/data/repositories/invitation_repository_impl.dart';
 import 'features/invitation/domain/repositories/invitation_repository.dart';
 import 'features/invitation/domain/usecases/invitation_usecases.dart';
 import 'features/invitation/presentation/bloc/invitation_editor_cubit.dart';
+import 'features/invitation/presentation/bloc/guest_view_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -125,6 +126,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RegisterWithEmail(sl()));
   sl.registerLazySingleton(() => SignInWithGoogle(sl()));
   sl.registerLazySingleton(() => SignInWithFacebook(sl()));
+  sl.registerLazySingleton(() => SignInAnonymously(sl()));
   sl.registerLazySingleton(() => SendEmailVerification(sl()));
   sl.registerLazySingleton(() => ReloadUser(sl()));
   sl.registerLazySingleton(() => SendPasswordReset(sl()));
@@ -198,6 +200,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => UpdateGuest(sl()));
   sl.registerLazySingleton(() => DeleteGuest(sl()));
   sl.registerLazySingleton(() => CheckInGuest(sl()));
+  sl.registerLazySingleton(() => WatchGuest(sl()));
   sl.registerFactory(
     () => GuestsCubit(
       watchGuests: sl(),
@@ -342,6 +345,18 @@ Future<void> init() async {
       watchInvitation: sl(),
       saveInvitation: sl(),
       uploadBackground: sl(),
+      imagePicker: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => GuestViewCubit(
+      getCurrentUser: sl(),
+      signInAnonymously: sl(),
+      watchEvent: sl(),
+      watchInvitation: sl(),
+      watchGuest: sl(),
+      watchTables: sl(),
+      uploadPhoto: sl(),
       imagePicker: sl(),
     ),
   );

@@ -21,6 +21,7 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> reloadUser();
   Future<void> sendPasswordReset(String email);
   Future<void> signOut();
+  Future<UserModel> signInAnonymously();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -167,6 +168,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         isNew: cred.additionalUserInfo?.isNewUser ?? false,
       );
       return model;
+    });
+  }
+
+  @override
+  Future<UserModel> signInAnonymously() {
+    return _run(() async {
+      final cred = await _auth.signInAnonymously();
+      return UserModel.fromFirebase(cred.user!);
     });
   }
 

@@ -109,6 +109,12 @@ class _LoginForm extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => context.push(AppRoutes.guestAccess),
+              icon: const Icon(Icons.mail_outline),
+              label: const Text('Tengo una invitación'),
+            ),
           ],
         );
       },

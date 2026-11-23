@@ -39,6 +39,10 @@ class AuthRepositoryImpl implements AuthRepository {
       _guard(_remote.signInWithFacebook);
 
   @override
+  Future<Either<Failure, UserEntity>> signInAnonymously() =>
+      _guard(_remote.signInAnonymously);
+
+  @override
   Future<Either<Failure, Unit>> sendEmailVerification() =>
       _guardUnit(_remote.sendEmailVerification);
 

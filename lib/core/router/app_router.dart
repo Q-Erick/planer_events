@@ -23,6 +23,8 @@ import '../../features/subscription/presentation/pages/checkout_page.dart';
 import '../../features/subscription/presentation/pages/plans_page.dart';
 import '../../features/album/presentation/pages/album_page.dart';
 import '../../features/invitation/presentation/pages/invitation_editor_page.dart';
+import '../../features/invitation/presentation/pages/guest_access_page.dart';
+import '../../features/invitation/presentation/pages/guest_invitation_page.dart';
 import '../../injection_container.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -40,6 +42,7 @@ class AppRoutes {
   static const locationPicker = '/location-picker';
   static const notifications = '/notifications';
   static const plans = '/plans';
+  static const guestAccess = '/guest-access';
 
   static String eventDetail(String id) => '/events/$id';
   static String eventEdit(String id) => '/events/$id/edit';
@@ -49,6 +52,11 @@ class AppRoutes {
   static String album(String eventId) => '/events/$eventId/album';
   static String invitation(String eventId) => '/events/$eventId/invitation';
   static String checkout(String planId) => '/plans/checkout/$planId';
+  static String guestInvitation(String eventId, String guestId) =>
+      '/i/$eventId/$guestId';
+
+  static bool isGuestRoute(String location) =>
+      location.startsWith('/i/') || location == guestAccess;
 
   /// Rutas que solo se ven sin sesión.
   static const authRoutes = {login, register, forgotPassword};
@@ -148,11 +156,25 @@ class AppRouter {
         builder: (context, state) =>
             CheckoutPage(planId: planIdFrom(state.pathParameters['plan'])),
       ),
+      GoRoute(
+        path: AppRoutes.guestAccess,
+        builder: (context, state) => const GuestAccessPage(),
+      ),
+      GoRoute(
+        path: '/i/:eventId/:guestId',
+        builder: (context, state) => GuestInvitationPage(
+          eventId: state.pathParameters['eventId']!,
+          guestId: state.pathParameters['guestId']!,
+        ),
+      ),
     ],
   );
 
   static String? _redirect(BuildContext context, GoRouterState state) {
     final location = state.matchedLocation;
+
+    // 0. Las rutas del invitado no piden onboarding ni cuenta
+    if (AppRoutes.isGuestRoute(location)) return null;
 
     // 1. Primero la introducción
     if (!sl<IsOnboardingCompleted>()()) {
@@ -160,15 +182,17 @@ class AppRouter {
     }
 
     final auth = sl<AuthBloc>().state;
+    final user = auth.user;
     final isAuthRoute = AppRoutes.authRoutes.contains(location);
 
-    // 2. Sin sesión
-    if (!auth.isAuthenticated) {
+    // 2. Sin sesión (o invitado anónimo fuera de su invitación)
+    final hasAccount = auth.isAuthenticated && !(user?.isAnonymous ?? false);
+    if (!hasAccount) {
       return isAuthRoute ? null : AppRoutes.login;
     }
 
     // 3. Correo sin verificar
-    if (auth.user!.needsEmailVerification) {
+    if (user!.needsEmailVerification) {
       return location == AppRoutes.verifyEmail ? null : AppRoutes.verifyEmail;
     }
 

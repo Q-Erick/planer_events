@@ -9,6 +9,7 @@ abstract class GuestRemoteDataSource {
   Future<void> updateGuest(GuestModel guest);
   Future<void> deleteGuest(String eventId, String guestId);
   Future<void> checkIn(String eventId, String guestId);
+  Stream<GuestModel> watchGuest(String eventId, String guestId);
 }
 
 class GuestRemoteDataSourceImpl implements GuestRemoteDataSource {
@@ -72,5 +73,15 @@ class GuestRemoteDataSourceImpl implements GuestRemoteDataSource {
     } on FirebaseException catch (e) {
       throw ServerException(e.message ?? 'No se pudo registrar la llegada.');
     }
+  }
+
+  @override
+  Stream<GuestModel> watchGuest(String eventId, String guestId) {
+    return _guests(eventId).doc(guestId).snapshots().map((doc) {
+      if (!doc.exists) {
+        throw const ServerException('Esta invitación ya no existe.');
+      }
+      return GuestModel.fromFirestore(doc);
+    });
   }
 }

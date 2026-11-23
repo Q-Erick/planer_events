@@ -80,3 +80,12 @@ class CheckInGuest implements UseCase<Unit, GuestRef> {
   Future<Either<Failure, Unit>> call(GuestRef ref) =>
       _repository.checkIn(ref.eventId, ref.guestId);
 }
+
+class WatchGuest implements StreamUseCase<GuestEntity, GuestRef> {
+  const WatchGuest(this._repository);
+  final GuestRepository _repository;
+
+  @override
+  Stream<Either<Failure, GuestEntity>> call(GuestRef ref) =>
+      _repository.watchGuest(ref.eventId, ref.guestId);
+}

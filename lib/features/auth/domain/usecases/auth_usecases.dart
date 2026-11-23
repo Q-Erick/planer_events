@@ -121,3 +121,12 @@ class SignOut implements UseCase<Unit, NoParams> {
   @override
   Future<Either<Failure, Unit>> call(NoParams params) => _repository.signOut();
 }
+
+class SignInAnonymously implements UseCase<UserEntity, NoParams> {
+  const SignInAnonymously(this._repository);
+  final AuthRepository _repository;
+
+  @override
+  Future<Either<Failure, UserEntity>> call(NoParams params) =>
+      _repository.signInAnonymously();
+}

@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/snackbars.dart';
 import '../../../../core/widgets/user_avatar.dart';
@@ -8,8 +10,9 @@ import '../../domain/entities/guest_entity.dart';
 import '../bloc/guests_cubit.dart';
 import '../widgets/guest_form_sheet.dart';
 import '../widgets/guest_qr_dialog.dart';
+import '../../../../core/router/app_router.dart';
 
-enum _GuestAction { qr, edit, delete }
+enum _GuestAction { qr, invitation, copyCode, edit, delete }
 
 class GuestsPage extends StatelessWidget {
   const GuestsPage({super.key, required this.eventId});
@@ -147,6 +150,16 @@ class _GuestTile extends StatelessWidget {
 
   Future<void> _onAction(BuildContext context, _GuestAction action) async {
     switch (action) {
+      case _GuestAction.invitation:
+        await context.push(AppRoutes.guestInvitation(guest.eventId, guest.id));
+      case _GuestAction.copyCode:
+        await Clipboard.setData(ClipboardData(text: guest.qrData));
+        if (context.mounted) {
+          showAppSnackBar(
+            context,
+            'Código copiado. Envíalo a ${guest.name} para que abra su invitación.',
+          );
+        }
       case _GuestAction.qr:
         await showGuestQrDialog(context, guest);
       case _GuestAction.edit:
@@ -207,6 +220,20 @@ class _GuestTile extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(Icons.qr_code_2),
                   title: Text('Ver pase QR'),
+                ),
+              ),
+              PopupMenuItem(
+                value: _GuestAction.invitation,
+                child: ListTile(
+                  leading: Icon(Icons.mail_outline),
+                  title: Text('Ver su invitación'),
+                ),
+              ),
+              PopupMenuItem(
+                value: _GuestAction.copyCode,
+                child: ListTile(
+                  leading: Icon(Icons.copy),
+                  title: Text('Copiar código'),
                 ),
               ),
               PopupMenuItem(

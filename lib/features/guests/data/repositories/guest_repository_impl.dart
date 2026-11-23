@@ -51,4 +51,10 @@ class GuestRepositoryImpl implements GuestRepository {
         await _remote.checkIn(eventId, guestId);
         return unit;
       });
+
+  @override
+  Stream<Either<Failure, GuestEntity>> watchGuest(
+    String eventId,
+    String guestId,
+  ) => _remote.watchGuest(eventId, guestId).toEither();
 }

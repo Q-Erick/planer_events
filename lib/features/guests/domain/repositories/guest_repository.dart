@@ -15,4 +15,9 @@ abstract class GuestRepository {
 
   /// Marca que el invitado ya llegó al evento.
   Future<Either<Failure, Unit>> checkIn(String eventId, String guestId);
+
+  Stream<Either<Failure, GuestEntity>> watchGuest(
+    String eventId,
+    String guestId,
+  );
 }
