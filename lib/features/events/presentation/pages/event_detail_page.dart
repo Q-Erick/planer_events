@@ -238,9 +238,11 @@ class _EventDetailBody extends StatelessWidget {
                     crossAxisSpacing: 12,
                     childAspectRatio: 1.4,
                     children: [
-                      const _ModuleTile(
+                      _ModuleTile(
                         icon: Icons.mail_outline,
                         label: 'Invitación',
+                        onTap: () =>
+                            context.push(AppRoutes.invitation(event.id)),
                       ),
                       _ModuleTile(
                         icon: Icons.people_outline,

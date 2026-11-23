@@ -69,6 +69,11 @@ import 'features/album/data/repositories/album_repository_impl.dart';
 import 'features/album/domain/repositories/album_repository.dart';
 import 'features/album/domain/usecases/album_usecases.dart';
 import 'features/album/presentation/bloc/album_cubit.dart';
+import 'features/invitation/data/datasources/invitation_remote_datasource.dart';
+import 'features/invitation/data/repositories/invitation_repository_impl.dart';
+import 'features/invitation/domain/repositories/invitation_repository.dart';
+import 'features/invitation/domain/usecases/invitation_usecases.dart';
+import 'features/invitation/presentation/bloc/invitation_editor_cubit.dart';
 
 final sl = GetIt.instance; // sl = service locator
 
@@ -317,6 +322,26 @@ Future<void> init() async {
       watchEvent: sl(),
       uploadPhoto: sl(),
       deletePhoto: sl(),
+      imagePicker: sl(),
+    ),
+  );
+
+  // Invitación
+  sl.registerLazySingleton<InvitationRemoteDataSource>(
+    () => InvitationRemoteDataSourceImpl(firestore: sl(), storage: sl()),
+  );
+  sl.registerLazySingleton<InvitationRepository>(
+    () => InvitationRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => WatchInvitation(sl()));
+  sl.registerLazySingleton(() => SaveInvitation(sl()));
+  sl.registerLazySingleton(() => UploadInvitationBackground(sl()));
+  sl.registerFactory(
+    () => InvitationEditorCubit(
+      watchEvent: sl(),
+      watchInvitation: sl(),
+      saveInvitation: sl(),
+      uploadBackground: sl(),
       imagePicker: sl(),
     ),
   );
